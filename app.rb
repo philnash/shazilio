@@ -2,6 +2,7 @@ require 'open-uri'
 require 'securerandom'
 
 Envyable.load('./config/env.yml', settings.env.to_s)
+echoprint = EchoPrint.new(ENV['ECHONEST_API_KEY'])
 
 post '/voice' do
   uuid = SecureRandom.uuid
@@ -33,5 +34,8 @@ post '/recording/:id' do
       end
     end
   end
+
+  echoprint.identify("./tmp/#{params[:id]}.mp3")
 end
+
 
