@@ -3,12 +3,14 @@ GEM
   specs:
     builder (3.2.2)
     daemons (1.1.9)
+    envyable (0.0.2)
     eventmachine (1.0.3)
     jwt (1.0.0)
     multi_json (1.10.1)
     rack (1.5.2)
     rack-protection (1.5.3)
       rack
+    redis (3.2.0)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -27,6 +29,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  envyable
+  redis
   sinatra
   thin
   twilio-ruby

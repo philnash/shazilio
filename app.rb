@@ -1,5 +1,7 @@
 require 'open-uri'
 
+Envyable.load('./config/env.yml', settings.env.to_s)
+
 post '/voice' do
   content_type 'text/xml'
   '
