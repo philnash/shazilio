@@ -1,17 +1,23 @@
 require 'open-uri'
+require 'securerandom'
 
 Envyable.load('./config/env.yml', settings.env.to_s)
 
 post '/voice' do
+  uuid = SecureRandom.uuid
+  number = params['From']
   content_type 'text/xml'
-  '
-  <Response>
-    <Record action="/recording" maxLength="30" playBeep="false" />
-  </Response>
-  '
+  response = Twilio::TwiML::Response.new do |r|
+    r.Record(
+      :action => "/recording/#{uuid}",
+      :maxLength => 30,
+      :playBeep => false
+    )
+  end
+  response.to_xml
 end
 
-post '/recording' do
+post '/recording/:id' do
   mp3_url = "#{params["RecordingUrl"]}.mp3"
   uri = URI(mp3_url)
 
@@ -20,7 +26,7 @@ post '/recording' do
 
     http.request request do |response|
       FileUtils.mkdir_p './tmp'
-      File.open './tmp/test.mp3', 'w' do |io|
+      File.open "./tmp/#{params[:id]}.mp3", 'w' do |io|
         response.read_body do |chunk|
           io.write chunk
         end
