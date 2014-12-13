@@ -1,16 +1,18 @@
 require 'open-uri'
-require 'securerandom'
 
 Envyable.load('./config/env.yml', settings.env.to_s)
 echoprint = EchoPrint.new(ENV['ECHONEST_API_KEY'])
 
+Twilio.configure do |config|
+  config.account_sid = ENV['TWILIO_ACCOUNT_SID']
+  config.auth_token  = ENV['TWILIO_AUTH_TOKEN']
+end
+
 post '/voice' do
-  uuid = SecureRandom.uuid
-  number = params['From']
   content_type 'text/xml'
   response = Twilio::TwiML::Response.new do |r|
     r.Record(
-      :action => "/recording/#{uuid}",
+      :action => "/recording",
       :maxLength => 30,
       :playBeep => false
     )
@@ -18,8 +20,19 @@ post '/voice' do
   response.to_xml
 end
 
-post '/recording/:id' do
+post '/recording' do
+  number = params["From"]
+  id = params["RecordingSid"]
   mp3_url = "#{params["RecordingUrl"]}.mp3"
+  file_path = "./tmp/#{id}.mp3"
+
+  # client = Twilio::REST::Client.new
+  # client.messages.create(
+  #   :to   => number,
+  #   :from => '+442033898457',
+  #   :body => 'Thanks for the call, we will have your song shortly.'
+  # )
+
   uri = URI(mp3_url)
 
   Net::HTTP.start(uri.host, uri.port) do |http|
@@ -27,7 +40,7 @@ post '/recording/:id' do
 
     http.request request do |response|
       FileUtils.mkdir_p './tmp'
-      File.open "./tmp/#{params[:id]}.mp3", 'w' do |io|
+      File.open file_path, 'w' do |io|
         response.read_body do |chunk|
           io.write chunk
         end
@@ -35,7 +48,7 @@ post '/recording/:id' do
     end
   end
 
-  echoprint.identify("./tmp/#{params[:id]}.mp3")
+  puts echoprint.identify(file_path).inspect
 end
 
 
