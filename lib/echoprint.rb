@@ -1,14 +1,13 @@
 class EchoPrint
   require 'net/http'
 
-  attr_reader :filename, :api_key
+  attr_reader :api_key
 
-  def initialize(filename, api_key)
-    @filename = filename
+  def initialize(api_key)
     @api_key = api_key
   end
 
-  def identify
+  def identify(filename)
     json = `echoprint-codegen "#{filename}"`
 
     http = Net::HTTP.new(uri.host, uri.port)
