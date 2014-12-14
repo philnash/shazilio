@@ -1,4 +1,5 @@
 require 'open-uri'
+require './lib/echoprint'
 
 Envyable.load('./config/env.yml', settings.env.to_s)
 echoprint = EchoPrint.new(ENV['ECHONEST_API_KEY'])
